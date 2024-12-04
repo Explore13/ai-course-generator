@@ -17,7 +17,7 @@ function AddCourse() {
           Hello, <span className="font-bold">{user?.fullName || "User"}</span>
         </h2>
         <p className="text-sm text-gray-500">
-          Create new course with AI, Share with friends and Earn from it.
+          Create new course with AI, Share with friends and Learn.
         </p>
       </div>
       <Link

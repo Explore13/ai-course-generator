@@ -37,7 +37,6 @@ function EditCourseBasicInfo({ course, refreshData }) {
         .returning({ id: CourseList.id });
 
       console.log(result);
-
       refreshData(true);
     } catch (error) {
       console.log(error);

@@ -68,7 +68,7 @@ function CourseCard({ course, refreshData, displayUser = false }) {
         <h2 className="font-medium text-lg flex justify-between items-center">
           {course?.courseOutput?.CourseName}
           {!displayUser && (
-            <DropdownOption handleOnDelete={() => handleOnDelete()}>
+            <DropdownOption courseId = {course?.courseId} handleOnDelete={() => handleOnDelete()}>
               <HiEllipsisVertical />
             </DropdownOption>
           )}

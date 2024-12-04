@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useContext, useEffect } from "react";
+import React, { use, useContext, useEffect } from "react";
 import { Progress } from "@/components/ui/progress";
 
 import {
@@ -10,17 +10,14 @@ import {
   HiOutlineSquare3Stack3D,
   HiOutlineShieldCheck,
   HiMiniPower,
+  HiChevronDoubleLeft,
 } from "react-icons/hi2";
 import { UserCourseListContext } from "@/app/_context/UserCourseListContext";
 
-function SideBar() {
+function MobileSideBar({ handleMobileSidebar }) {
   const { userCourseList, setUserCourseList } = useContext(
     UserCourseListContext
   );
-
-  useEffect(() => {
-    setUserCourseList(JSON.parse(localStorage.getItem("userCourseList")));
-  }, []);
 
   const path = usePathname();
   const Menu = [
@@ -49,14 +46,24 @@ function SideBar() {
       path: "/dashboard/logout",
     },
   ];
+
   return (
-    <div className="fixed h-full md:w-64 p-5 shadow-md">
-      <Image
-        src={"/seedofocode_logo.png"}
-        alt="logo"
-        width={150}
-        height={100}
-      />
+    <div className="fixed bg-white h-full md:w-64 p-5 shadow-md z-50">
+      <div className="flex items-center justify-between">
+        <Link href="/dashboard">
+          <Image
+            src={"/seedofocode_icon.png"}
+            alt="logo"
+            width={50}
+            height={50}
+          />
+        </Link>
+        <HiChevronDoubleLeft
+          onClick={() => handleMobileSidebar(true)}
+          className="md:hidden cursor-pointer"
+          size={25}
+        />
+      </div>
       <hr className="my-5" />
       <ul>
         {Menu.map((item, index) => (
@@ -79,18 +86,12 @@ function SideBar() {
         <h2 className="text-sm my-2">
           {userCourseList?.length} Out of 5 Course Created
         </h2>
-        <Link href="/dashboard/upgrade">
-          <h2
-            className={`text-xs hover:underline text-gray-700 ${
-              (userCourseList?.length / 5) * 100 >= 60 && "text-blue-700"
-            }`}
-          >
-            Upgrade your plan for unlimited course generation
-          </h2>
-        </Link>
+        <h2 className="text-xs text-gray-700">
+          Upgrade your plan for unlimited course generation
+        </h2>
       </div>
     </div>
   );
 }
 
-export default SideBar;
+export default MobileSideBar;

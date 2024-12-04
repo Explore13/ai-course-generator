@@ -7,7 +7,14 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import CourseBasicInfo from "../_components/CourseBasicInfo";
 import { HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
-
+import {
+  EmailIcon,
+  EmailShareButton,
+  LinkedinIcon,
+  LinkedinShareButton,
+  WhatsappIcon,
+  WhatsappShareButton,
+} from "react-share";
 function FinishScreen({ params }) {
   const Params = React.use(params);
   const { user } = useUser();
@@ -44,7 +51,7 @@ function FinishScreen({ params }) {
         Congrats ! Your Course is Ready
       </h2>
 
-      <CourseBasicInfo course={course} refreshData={true} />
+      <CourseBasicInfo course={course} refreshData={() => GetCourse()} />
 
       <h2 className="mt-3">Course URL : </h2>
       <h2 className="text-center flex items-center gap-5 justify-center text-gray-400 border p-2 rounded">
@@ -58,6 +65,44 @@ function FinishScreen({ params }) {
           }
         />
       </h2>
+
+      <div className="flex justify-center items-center gap-5 p-2 mt-2">
+        <WhatsappShareButton
+          title="Check out this course from SeedOfCode. "
+          url={`${
+            process.env.NEXT_PUBLIC_HOST_NAME + "/course/" + course?.courseId
+          }`}
+          windowWidth={800}
+          windowHeight={600}
+          separator={`Course Name : ${course?.courseOutput?.CourseName} \n Created By : ${course?.userName} \nClick on the link to view the course : `}
+        >
+          <WhatsappIcon size={30} round={true} />
+        </WhatsappShareButton>
+
+        <EmailShareButton
+          url={`${
+            process.env.NEXT_PUBLIC_HOST_NAME + "/course/" + course?.courseId
+          }`}
+          windowWidth={800}
+          windowHeight={600}
+          subject={`SeedOfCode Course : ${course?.courseOutput?.CourseName}`}
+          body="Check out this course from SeedOfCode. "
+          separator={`Course Name : ${course?.courseOutput?.CourseName}\n Created By : ${course?.userName} \nClick on the link to view the course : `}
+        >
+          <EmailIcon size={30} round={true} />
+        </EmailShareButton>
+
+        <LinkedinShareButton
+          title="Check out this course from SeedOfCode. "
+          summary={`Course Name : ${course?.courseOutput?.CourseName}\n Created By : ${course?.userName} \nClick on the link to view the course : `}
+          source={`https://seedofcode-ai-course-generator.vercel.app/`}
+          url={`${
+            process.env.NEXT_PUBLIC_HOST_NAME + "/course/" + course?.courseId
+          }`}
+        >
+          <LinkedinIcon size={30} round={true} />
+        </LinkedinShareButton>
+      </div>
     </div>
   );
 }

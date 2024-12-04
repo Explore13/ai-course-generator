@@ -4,6 +4,7 @@ import { CourseList } from "@/configs/schema";
 import React, { useEffect, useState } from "react";
 import CourseCard from "../_components/CourseCard";
 import { Button } from "@/components/ui/button";
+import { desc } from "drizzle-orm";
 
 function Explore() {
   const [courseList, setCourseList] = useState([]);
@@ -20,9 +21,16 @@ function Explore() {
     //   .limit(9)
     //   .offset(pageIndex * 9);
 
-    const result = await db.select().from(CourseList);
-    console.log(result);
-    setCourseList(result);
+    try {
+      const result = await db
+        .select()
+        .from(CourseList)
+        .orderBy(desc(CourseList.id));
+      console.log(result);
+      setCourseList(result);
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <div>

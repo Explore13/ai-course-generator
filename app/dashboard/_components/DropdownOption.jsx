@@ -19,9 +19,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-import { HiOutlineTrash } from "react-icons/hi";
+import { HiOutlineTrash } from "react-icons/hi2";
+import Link from "next/link";
+import { HiMiniPencilSquare } from "react-icons/hi2";
 
-function DropdownOption({ children, handleOnDelete }) {
+function DropdownOption({ courseId, children, handleOnDelete }) {
   const [alertOpen, setAlertOpen] = useState(false);
 
   return (
@@ -29,12 +31,21 @@ function DropdownOption({ children, handleOnDelete }) {
       <DropdownMenu>
         <DropdownMenuTrigger>{children}</DropdownMenuTrigger>
         <DropdownMenuContent>
+        <DropdownMenuItem>
+            <Link href={`/create-course/${courseId}/finish`} className="cursor-pointer">
+              <div className="flex gap-1 items-center">
+                <HiMiniPencilSquare />
+                Edit
+              </div>
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setAlertOpen(true)}>
             <div className="flex gap-1 items-center cursor-pointer">
               <HiOutlineTrash />
               Delete
             </div>
           </DropdownMenuItem>
+          
         </DropdownMenuContent>
       </DropdownMenu>
 

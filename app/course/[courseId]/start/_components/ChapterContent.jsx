@@ -1,26 +1,28 @@
-import React from "react";
+import React, { useEffect } from "react";
 import YouTube from "react-youtube";
 import ReactMarkdown from "react-markdown";
-import { HiOutlineClipboardList } from "react-icons/hi";
+import { HiChevronDoubleRight, HiOutlineClipboardList } from "react-icons/hi";
+import "./youtubeAdjustments.css";
 
-const opts = {
-  height: "390",
-  width: "640",
-  playerVars: {
-    // https://developers.google.com/youtube/player_parameters
-    autoplay: 1,
-  },
-};
-
-function ChapterContent({ chapter, content }) {
+function ChapterContent({ chapter, content, handleSideBarFunction }) {
   return (
-    <div className="p-10">
-      <h2 className="font-medium text-4xl">{chapter?.ChapterName}</h2>
-      <p className="text-gray-500">{chapter?.About}</p>
+    <div className="px-10">
+      <HiChevronDoubleRight
+        onClick={() => handleSideBarFunction(true)}
+        className="md:hidden mb-5 cursor-pointer border-green-500 border-2 rounded-sm hover:bg-primary hover:text-white"
+        size={30}
+      />
 
+      <div>
+        <h2 className="font-medium text-4xl">{chapter?.ChapterName}</h2>
+        <p className="text-gray-500">{chapter?.About}</p>
+      </div>
       {/* Video */}
-      <div className="flex justify-center my-6">
-        <YouTube videoId={content?.videoId} opts={opts} />
+      <div className="video-responsive my-6">
+        <YouTube
+          videoId={content?.videoId}
+          opts={{ playerVars: { autoplay: 0 } }}
+        />
       </div>
 
       {/* Content */}
@@ -46,7 +48,7 @@ function ChapterContent({ chapter, content }) {
                     className="cursor-pointer"
                   />
                 </h2>
-                <pre className="break-words whitespace-pre-wrap">
+                <pre className="break-words whitespace-pre-wrap overflow-auto">
                   <code>{item.codeExample.replace(/<\/?precode>/g, "")}</code>
                 </pre>
               </div>

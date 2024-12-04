@@ -11,13 +11,14 @@ function ChapterListCard({ chapter, index }) {
       </div>
 
       <div className="col-span-4">
-        <h2 className="font-medium">{chapter?.ChapterName}</h2>
+        <h2 className="font-medium">
+          {chapter?.ChapterName}
+        </h2>
         <h2 className="flex items-center gap-2 text-sm text-primary">
           <HiOutlineClock />
           {chapter?.Duration}
         </h2>
       </div>
-
     </div>
   );
 }

@@ -3,9 +3,16 @@ import React, { useState } from "react";
 import SideBar from "./_components/SideBar";
 import Header from "./_components/Header";
 import { UserCourseListContext } from "../_context/UserCourseListContext";
+import MobileSideBar from "./_components/MobileSideBar";
 
 function DashboardLayout({ children }) {
   const [userCourseList, setUserCourseList] = useState([]);
+  const [handleSidebar, setHandleSidebar] = useState(false);
+
+  const handleMobileSidebar = () => {
+    setHandleSidebar(!handleSidebar);
+  };
+
   return (
     <UserCourseListContext.Provider
       value={{ userCourseList, setUserCourseList }}
@@ -15,8 +22,14 @@ function DashboardLayout({ children }) {
           <SideBar />
         </div>
 
+        <div className="md:hidden">
+          {handleSidebar && (
+            <MobileSideBar handleMobileSidebar={() => handleMobileSidebar()} />
+          )}
+        </div>
+
         <div className="md:ml-64">
-          <Header />
+          <Header hamBurger = {true} handleMobileSidebar={() => handleMobileSidebar()} />
           <div className="p-10">{children}</div>
         </div>
       </div>

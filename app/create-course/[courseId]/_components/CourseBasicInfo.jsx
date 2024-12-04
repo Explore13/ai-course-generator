@@ -68,7 +68,9 @@ function CourseBasicInfo({ course, refreshData, edit = true }) {
             {edit && (
               <EditCourseBasicInfo
                 course={course}
-                refreshData={() => refreshData(true)}
+                refreshData={() => {
+                  refreshData(true);
+                }}
               />
             )}
           </h2>
