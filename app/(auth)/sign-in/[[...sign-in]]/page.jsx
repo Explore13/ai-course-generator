@@ -70,7 +70,7 @@ export default function Page() {
                 path based on your interests and goals.
               </p>
             </div>
-            <div className="flex items-center justify-center mx-2 p-3">
+            <div className="flex items-center justify-center mt-10">
             <SignIn />
             </div>
           </div>
