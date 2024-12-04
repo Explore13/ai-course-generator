@@ -64,13 +64,15 @@ export default function Page() {
                 Welcome to SeedOfCode 🤖
               </h1>
 
-              <p className="mt-4 leading-relaxed text-gray-500">
+              <p className="mx-2 leading-relaxed text-gray-500">
                 SeedOfCode is a platform that helps you to learn coding in a fun
                 and interactive way. We provide you with a personalized learning
                 path based on your interests and goals.
               </p>
             </div>
+            <div className="flex items-center justify-center mx-2">
             <SignIn />
+            </div>
           </div>
         </main>
       </div>
