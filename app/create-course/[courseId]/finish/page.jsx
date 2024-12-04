@@ -87,14 +87,14 @@ function FinishScreen({ params }) {
           windowHeight={600}
           subject={`SeedOfCode Course : ${course?.courseOutput?.CourseName}`}
           body="Check out this course from SeedOfCode. "
-          separator={`Course Name : ${course?.courseOutput?.CourseName}\n Created By : ${course?.userName} \nClick on the link to view the course : `}
+          separator={`\nCourse Name : ${course?.courseOutput?.CourseName}\n Created By : ${course?.userName} \nClick on the link to view the course : `}
         >
           <EmailIcon size={30} round={true} />
         </EmailShareButton>
 
         <LinkedinShareButton
           title="Check out this course from SeedOfCode. "
-          summary={`Course Name : ${course?.courseOutput?.CourseName}\n Created By : ${course?.userName} \nClick on the link to view the course : `}
+          summary={`\nCourse Name : ${course?.courseOutput?.CourseName}\n Created By : ${course?.userName} \nClick on the link to view the course : `}
           source={`https://seedofcode-ai-course-generator.vercel.app/`}
           url={`${
             process.env.NEXT_PUBLIC_HOST_NAME + "/course/" + course?.courseId
