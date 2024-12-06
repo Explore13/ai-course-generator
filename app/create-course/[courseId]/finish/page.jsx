@@ -15,15 +15,19 @@ import {
   WhatsappIcon,
   WhatsappShareButton,
 } from "react-share";
+import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 function FinishScreen({ params }) {
   const Params = React.use(params);
   const { user } = useUser();
   const [course, setCourse] = useState(null);
   const router = useRouter();
+  const { toast } = useToast();
 
   useEffect(() => {
-    console.log(Params); //courseId
-    console.log(user);
+    // console.log(Params); //courseId
+    // console.log(user);
 
     Params && GetCourse();
   }, [Params, user]);
@@ -40,9 +44,15 @@ function FinishScreen({ params }) {
           )
         );
       setCourse(result[0]);
-      console.log("Course data:", result[0]);
+      // console.log("Course data:", result[0]);
     } catch (error) {
-      console.error("Error fetching course:", error);
+      // console.error("Error fetching course:", error);
+      toast({
+        variant: "destructive",
+        duration: 3000,
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+      });
     }
   };
   return (
@@ -53,6 +63,11 @@ function FinishScreen({ params }) {
 
       <CourseBasicInfo course={course} refreshData={() => GetCourse()} />
 
+      <div className="flex justify-center">
+        <Link href="/dashboard">
+          <Button className="mt-5">Go to Dashboard</Button>
+        </Link>
+      </div>
       <h2 className="mt-3">Course URL : </h2>
       <h2 className="text-center flex items-center gap-5 justify-center text-gray-400 border p-2 rounded">
         {process.env.NEXT_PUBLIC_HOST_NAME}/course/{course?.courseId}
@@ -67,6 +82,7 @@ function FinishScreen({ params }) {
       </h2>
 
       <div className="flex justify-center items-center gap-5 p-2 mt-2">
+        <h2>Share : </h2>
         <WhatsappShareButton
           title="Check out this course from SeedOfCode. "
           url={`${

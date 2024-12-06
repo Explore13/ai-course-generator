@@ -8,11 +8,13 @@ import { eq } from "drizzle-orm";
 import { deleteObject, ref } from "firebase/storage";
 import { storage } from "@/configs/firebaseConfig";
 import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
 
 function CourseCard({ course, refreshData, displayUser = false }) {
+  const { toast } = useToast();
   const handleOnDelete = async () => {
     try {
-      console.log("Course : " + course?.courseId);
+      // console.log("Course : " + course?.courseId);
 
       // Delete Banner Image
       if (course?.courseBanner != "/placeholder.png") {
@@ -25,7 +27,7 @@ function CourseCard({ course, refreshData, displayUser = false }) {
         const fileRef = ref(storage, decodeURIComponent(filePath));
 
         await deleteObject(fileRef);
-        console.log("Image Deleted");
+        // console.log("Image Deleted");
       }
 
       // Delete Course
@@ -34,7 +36,7 @@ function CourseCard({ course, refreshData, displayUser = false }) {
         .where(eq(CourseList.id, course?.id))
         .returning({ id: CourseList?.id });
 
-      console.log("Course Deleted : " + courseResponse);
+      // console.log("Course Deleted : " + courseResponse);
 
       // Delete Chapters
       const chapterResponse = await db
@@ -42,13 +44,25 @@ function CourseCard({ course, refreshData, displayUser = false }) {
         .where(eq(Chapters.courseId, course?.courseId))
         .returning({ id: Chapters?.id });
 
-      console.log("Chapters Deleted : " + chapterResponse);
+      // console.log("Chapters Deleted : " + chapterResponse);
 
       if (courseResponse && chapterResponse) {
         refreshData();
+        toast({
+          variant: "success",
+          duration: 3000,
+          title: "Course Deleted Successfully!",
+          description: "Course has been deleted successfully!",
+        });
       }
     } catch (error) {
-      console.log("Error during deletion : " + error);
+      // console.log("Error during deletion : " + error);
+      toast({
+        variant: "destructive",
+        duration: 3000,
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+      });
     }
   };
 
@@ -68,7 +82,10 @@ function CourseCard({ course, refreshData, displayUser = false }) {
         <h2 className="font-medium text-lg flex justify-between items-center">
           {course?.courseOutput?.CourseName}
           {!displayUser && (
-            <DropdownOption courseId = {course?.courseId} handleOnDelete={() => handleOnDelete()}>
+            <DropdownOption
+              courseId={course?.courseId}
+              handleOnDelete={() => handleOnDelete()}
+            >
               <HiEllipsisVertical />
             </DropdownOption>
           )}

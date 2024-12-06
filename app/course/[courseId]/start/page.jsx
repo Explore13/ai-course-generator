@@ -8,7 +8,7 @@ import React, { useState, useEffect } from "react";
 import { db } from "@/configs/db";
 import { Chapters, CourseList } from "@/configs/schema";
 import { and, eq } from "drizzle-orm";
-
+import { useToast } from "@/hooks/use-toast";
 
 function CourseStart({ params }) {
   const Params = React.use(params);
@@ -18,6 +18,7 @@ function CourseStart({ params }) {
   const [handleSidebar, setHandleSidebar] = useState(false);
   const [courseLoading, setCourseLoading] = useState(true);
   const [contentLoading, setContentLoading] = useState(true);
+  const { toast } = useToast();
 
   const handleSideBarFunction = () => {
     setHandleSidebar(!handleSidebar);
@@ -52,7 +53,13 @@ function CourseStart({ params }) {
         setCourse(fetchedCourse);
       }
     } catch (error) {
-      console.error(error);
+      // console.error(error);
+      toast({
+        variant: "destructive",
+        duration: 3000,
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+      });
     } finally {
       setCourseLoading(false);
     }
@@ -75,7 +82,12 @@ function CourseStart({ params }) {
         setSelectedChapterContent(result[0]);
       }
     } catch (error) {
-      console.error(error);
+      // console.log(error);
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+      });
     } finally {
       setContentLoading(false);
     }
@@ -151,8 +163,7 @@ function CourseStart({ params }) {
 
 export default CourseStart;
 
-
-// Without Skeleton Loading : 
+// Without Skeleton Loading :
 
 // "use client";
 // import { db } from "@/configs/db";

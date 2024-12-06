@@ -5,24 +5,36 @@ import CourseDetail from "@/app/create-course/[courseId]/_components/CourseDetai
 import Header from "@/app/dashboard/_components/Header";
 import { db } from "@/configs/db";
 import { CourseList } from "@/configs/schema";
+import { useToast } from "@/hooks/use-toast";
 import { eq } from "drizzle-orm";
 import React, { useEffect, useState } from "react";
 
 function Course({ params }) {
   const Params = React.use(params);
+  const { toast } = useToast();
   const [course, setCourse] = useState(null);
   useEffect(() => {
     params && GetCourse();
   }, [params]);
 
   const GetCourse = async () => {
-    const result = await db
-      .select()
-      .from(CourseList)
-      .where(eq(CourseList.courseId, Params?.courseId));
+    try {
+      const result = await db
+        .select()
+        .from(CourseList)
+        .where(eq(CourseList.courseId, Params?.courseId));
 
-    console.log(result[0]);
-    setCourse(result[0]);
+      // console.log(result[0]);
+      setCourse(result[0]);
+    } catch (error) {
+      // console.log(error);
+      toast({
+        variant: "destructive",
+        duration: 3000,
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+      });
+    }
   };
   return (
     <div>

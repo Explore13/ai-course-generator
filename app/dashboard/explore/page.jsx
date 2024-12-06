@@ -5,10 +5,12 @@ import React, { useEffect, useState } from "react";
 import CourseCard from "../_components/CourseCard";
 import { Button } from "@/components/ui/button";
 import { desc } from "drizzle-orm";
+import { useToast } from "@/hooks/use-toast";
 
 function Explore() {
   const [courseList, setCourseList] = useState([]);
   // const [pageIndex, setPageIndex] = useState(0);
+  const { toast } = useToast();
 
   useEffect(() => {
     GetAllCourses();
@@ -26,10 +28,16 @@ function Explore() {
         .select()
         .from(CourseList)
         .orderBy(desc(CourseList.id));
-      console.log(result);
+      // console.log(result);
       setCourseList(result);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
+      toast({
+        variant: "destructive",
+        duration: 3000,
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+      });
     }
   };
   return (

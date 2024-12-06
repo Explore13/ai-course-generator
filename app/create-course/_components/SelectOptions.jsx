@@ -78,7 +78,7 @@ function SelectOptions() {
           <label className="text-sm">📖 No of Chapters</label>
           <Input
             type="number"
-            placeholder="No of Chapters"
+            placeholder="No of Chapters (Between 1-20)"
             defaultValue={userCourseInput?.noOfChapters}
             onChange={(e) => handleInputChange("noOfChapters", e.target.value)}
           />

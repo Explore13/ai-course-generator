@@ -18,12 +18,14 @@ function ChapterContent({ chapter, content, handleSideBarFunction }) {
         <p className="text-gray-500">{chapter?.About}</p>
       </div>
       {/* Video */}
-      <div className="video-responsive my-6">
-        <YouTube
-          videoId={content?.videoId}
-          opts={{ playerVars: { autoplay: 0 } }}
-        />
-      </div>
+      {content?.videoId && (
+        <div className="video-responsive my-6">
+          <YouTube
+            videoId={content?.videoId}
+            opts={{ playerVars: { autoplay: 0 } }}
+          />
+        </div>
+      )}
 
       {/* Content */}
       <div>

@@ -12,6 +12,7 @@ import { GenerateChapterContent_AI } from "@/configs/AiModel";
 import LoadingDialog from "../_components/LoadingDialog";
 import getVideos from "@/configs/service";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 function CourseLayout({ params }) {
   const Params = React.use(params);
@@ -20,9 +21,11 @@ function CourseLayout({ params }) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  const { toast } = useToast();
+
   useEffect(() => {
-    console.log(Params); //courseId
-    console.log(user);
+    // console.log(Params); //courseId
+    // console.log(user);
 
     Params && GetCourse();
   }, [Params, user]);
@@ -39,9 +42,15 @@ function CourseLayout({ params }) {
           )
         );
       setCourse(result[0]);
-      console.log("Course data:", result[0]);
+      // console.log("Course data:", result[0]);
     } catch (error) {
-      console.error("Error fetching course:", error);
+      // console.error("Error fetching course:", error);
+      toast({
+        variant: "destructive",
+        duration: 3000,
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+      });
     }
   };
 
@@ -50,24 +59,32 @@ function CourseLayout({ params }) {
 
     try {
       const chapters = course?.courseOutput?.Chapters;
-      for (const [index, chapter] of chapters.entries()) {
-        console.log(`Generating Chapter Content for ${chapter?.ChapterName}`);
 
-        const PROMPT = `Explain the concept in Detail on Topic: ${course?.name}, Chapter: ${chapter?.ChapterName}, in JSON Format with list of array with field as title, explanation on given chapter in detail, Code Example(Code field in <precode> format) if applicable.`;
+      const includeVideo = course?.includeVideo;
+      // console.log("IncludeVideo : " + includeVideo);
+      for (const [index, chapter] of chapters.entries()) {
+        // console.log(`Generating Chapter Content for ${chapter?.ChapterName}`);
+
+        const PROMPT = `Explain the concept in Detail on Topic: ${course?.name}, Chapter: ${chapter?.ChapterName}, in JSON Format with list of array with field as title, explanation on given chapter in detail, Code Example(Code field in <precode> format) if applicable. Remember that everything will be passed through JSON.parse() function.`;
 
         const result = await GenerateChapterContent_AI.sendMessage(PROMPT);
-        console.log(result?.response?.text());
+        // console.log(result?.response?.text());
         const content = JSON.parse(result?.response?.text());
 
         // Generate Video URL
-        console.log(`Generating Video URL for ${chapter?.ChapterName}`);
-        let videoId = "";
-        const resp = await getVideos(course?.name + ":" + chapter?.ChapterName);
 
-        console.log(resp[0]?.id?.videoId);
-        videoId = resp[0]?.id?.videoId;
-        console.log(videoId);
+        let videoId = null;
 
+        if (includeVideo === "Yes") {
+          // console.log(`Generating Video URL for ${chapter?.ChapterName}`);
+          const resp = await getVideos(
+            course?.name + ":" + chapter?.ChapterName
+          );
+
+          // console.log(resp[0]?.id?.videoId);
+          videoId = resp[0]?.id?.videoId;
+          // console.log(videoId);
+        }
         // Save Chapter Content + Video URL
 
         await db.insert(Chapters).values({
@@ -76,6 +93,11 @@ function CourseLayout({ params }) {
           content: content,
           videoId: videoId,
         });
+        toast({
+          duration: 2000,
+          title: `Chapter ${index + 1} Generated Successfully!`,
+          description: `Chapter ${index + 1} has been generated successfully!`,
+        });
       }
       await db
         .update(CourseList)
@@ -83,9 +105,22 @@ function CourseLayout({ params }) {
           publish: true,
         })
         .where(eq(CourseList.courseId, course?.courseId));
+
+      toast({
+        variant: "success",
+        duration: 3000,
+        title: "Course Content Generated Successfully!",
+        description: "Course Content has been generated successfully!",
+      });
       router.replace("/create-course/" + course?.courseId + "/finish");
     } catch (error) {
-      console.log(error);
+      // console.log(error);
+      toast({
+        variant: "destructive",
+        duration: 5000,
+        title: "Uh oh! Something went wrong.",
+        description: error,
+      });
     } finally {
       setLoading(false);
     }

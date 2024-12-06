@@ -16,10 +16,11 @@ import { Button } from "@/components/ui/button";
 import { db } from "@/configs/db";
 import { CourseList } from "@/configs/schema";
 import { eq } from "drizzle-orm";
+import { useToast } from "@/hooks/use-toast";
 
 function EditChapters({ course, index, refreshData }) {
   const Chapters = course?.courseOutput?.Chapters;
-
+  const { toast } = useToast();
   const [chapterName, setChapterName] = useState();
   const [about, setAbout] = useState();
 
@@ -39,10 +40,22 @@ function EditChapters({ course, index, refreshData }) {
         .where(eq(CourseList?.id, course?.id))
         .returning({ id: CourseList.id });
 
-      console.log(result);
+      // console.log(result);
       refreshData(true);
+      toast({
+        variant: "success",
+        duration: 3000,
+        title: "Chapter Updated Successfully!",
+        description: "Chapter has been updated successfully!",
+      });
     } catch (error) {
-      console.log(error);
+      // console.log(error);
+      toast({
+        variant: "destructive",
+        duration: 3000,
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+      });
     }
   };
   return (

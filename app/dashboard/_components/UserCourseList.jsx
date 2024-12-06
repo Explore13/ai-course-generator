@@ -6,11 +6,12 @@ import { desc, eq } from "drizzle-orm";
 import React, { useContext, useEffect, useState } from "react";
 import CourseCard from "./CourseCard";
 import { UserCourseListContext } from "@/app/_context/UserCourseListContext";
+import { useToast } from "@/hooks/use-toast";
 
 function UserCourseList() {
   const [courseList, setCourseList] = useState([]);
-
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
   const { userCourseList, setUserCourseList } = useContext(
     UserCourseListContext
@@ -19,21 +20,33 @@ function UserCourseList() {
   const { user } = useUser();
   useEffect(() => {
     user && getUserCourses();
-    console.log("User : " + user?.fullName);
+    // console.log("User : " + user?.fullName);
   }, [user]);
 
   const getUserCourses = async () => {
-    const result = await db
-      .select()
-      .from(CourseList)
-      .where(eq(CourseList.createdBy, user?.primaryEmailAddress?.emailAddress))
-      .orderBy(desc(CourseList.id));
+    try {
+      const result = await db
+        .select()
+        .from(CourseList)
+        .where(
+          eq(CourseList.createdBy, user?.primaryEmailAddress?.emailAddress)
+        )
+        .orderBy(desc(CourseList.id));
 
-    console.log(result);
-    setCourseList(result);
-    setUserCourseList(result);
-    localStorage.setItem("userCourseList", JSON.stringify(result));
-    setIsLoading(false);
+      // console.log(result);
+      setCourseList(result);
+      setUserCourseList(result);
+      localStorage.setItem("userCourseList", JSON.stringify(result));
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        duration: 3000,
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

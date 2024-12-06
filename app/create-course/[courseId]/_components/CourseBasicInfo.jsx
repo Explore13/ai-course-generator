@@ -14,9 +14,11 @@ import { db } from "@/configs/db";
 import { CourseList } from "@/configs/schema";
 import { eq } from "drizzle-orm";
 import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
 
 function CourseBasicInfo({ course, refreshData, edit = true }) {
   const [selectedFile, setSelectedFile] = useState(null);
+  const { toast } = useToast();
 
   const onFileChanged = async (e) => {
     try {
@@ -34,7 +36,7 @@ function CourseBasicInfo({ course, refreshData, edit = true }) {
         const fileRef = ref(storage, decodeURIComponent(filePath));
 
         await deleteObject(fileRef);
-        console.log("Previous Image Deleted");
+        // console.log("Previous Image Deleted");
       }
 
       // Upload new image in storage
@@ -42,7 +44,13 @@ function CourseBasicInfo({ course, refreshData, edit = true }) {
       const storageRef = ref(storage, "ai-course/" + fileName);
 
       const snapshot = await uploadBytes(storageRef, file);
-      console.log("Uploaded Completed!");
+      // console.log("Uploaded Completed!");
+      toast({
+        variant: "success",
+        duration: 3000,
+        title: "Image Uploaded Successfully!",
+        description: "Image has been uploaded successfully.",
+      });
 
       const imageLink = await getDownloadURL(storageRef);
       // console.log("Image Link Generated!", imageLink);
@@ -54,7 +62,13 @@ function CourseBasicInfo({ course, refreshData, edit = true }) {
       // console.log(result);
       refreshData(true);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
+      toast({
+        variant: "destructive",
+        duration: 3000,
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+      });
     }
   };
 
@@ -63,11 +77,12 @@ function CourseBasicInfo({ course, refreshData, edit = true }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
           {/* Title */}
-          <h2 className="text-3xl font-bold">
-            {course?.courseOutput?.CourseName}{" "}
+          <h2 className="text-3xl font-bold flex gap-1">
+            {course?.courseOutput?.CourseName}
             {edit && (
               <EditCourseBasicInfo
                 course={course}
+                size={50}
                 refreshData={() => {
                   refreshData(true);
                 }}

@@ -17,6 +17,7 @@ import { CourseList } from "@/configs/schema";
 import uuid4 from "uuid4";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 function CreateCourse() {
   const StepperOptions = [
@@ -43,10 +44,11 @@ function CreateCourse() {
 
   const [activeIndex, setActiveIndex] = useState(0);
   const { user } = useUser();
+  const { toast } = useToast();
 
-  useEffect(() => {
-    console.log(userCourseInput);
-  }, [userCourseInput]);
+  // useEffect(() => {
+  //   // console.log(userCourseInput);
+  // }, [userCourseInput]);
 
   /**
    *  Used to check Next Button enabled or disabled
@@ -61,9 +63,12 @@ function CreateCourse() {
       (!userCourseInput?.level ||
         !userCourseInput?.displayVideo ||
         !userCourseInput?.noOfChapters ||
-        !userCourseInput?.duration)
+        !userCourseInput?.duration ||
+        userCourseInput.noOfChapters < 1 ||
+        userCourseInput.noOfChapters > 20)
     )
       return true;
+
     return false;
   };
 
@@ -88,14 +93,26 @@ function CreateCourse() {
         ", in JSON format";
 
       const FINAL_PROMPT = BASIC_PROMPT + USER_INPUT_PROMPT;
-      console.log(FINAL_PROMPT);
+      // console.log(FINAL_PROMPT);
 
       const result = await GenerateCourseLayout_AI.sendMessage(FINAL_PROMPT);
-      console.log(result.response.text());
-      console.log(JSON.parse(result.response.text()));
+      // console.log(result.response.text());
+      // console.log(JSON.parse(result.response.text()));
       SaveCourseLayoutInDB(JSON.parse(result.response?.text()));
+      toast({
+        variant: "success",
+        duration: 3000,
+        title: "Course Layout Generated Successfully!",
+        description: "Course Layout has been generated successfully!",
+      });
     } catch (error) {
-      console.log(error);
+      // console.log(error);
+      toast({
+        variant: "destructive",
+        duration: 3000,
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+      });
     } finally {
       setLoading(false);
     }
@@ -116,10 +133,16 @@ function CreateCourse() {
         userProfileImage: user?.imageUrl,
       });
 
-      console.log("Course Layout Saved in DB", result.command);
+      // console.log("Course Layout Saved in DB", result.command);
       router.replace(`/create-course/${id}`);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
+      toast({
+        variant: "destructive",
+        duration: 3000,
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+      });
     }
   };
   return (
