@@ -5,26 +5,30 @@
 
 ## Overview
 
-AI Course Generator is a web application built with **Next.js** to create and manage personalized coding courses. This project leverages the power of AI to curate course content dynamically, tailoring it to users' preferences and learning needs.
+AI Course Generator is a web application built with **Next.js** to create and manage personalized coding courses. This project leverages the power of **Gemini** for generating course content and integrates **YouTube videos** using the YouTube Data API v3, tailoring course materials to users' preferences and learning needs.
 
 ---
 
 ## Features
 
-- **AI-Generated Content**: Dynamically generate coding course materials using AI.
+- **AI-Generated Content**: Automatically generate coding course materials using Gemini.
+- **Video Integration**: Seamless YouTube video integration via YouTube Data API v3 to enrich learning.
 - **User Management**: Secure user authentication powered by [Clerk](https://clerk.dev).
-- **Optimized Performance**: Built with modern web technologies like Next.js, including optimized font loading.
+- **Optimized Performance**: Built with modern web technologies like Next.js and Tailwind CSS for styling.
 - **Responsive Design**: Fully responsive and mobile-friendly.
 
 ---
 
 ## Tech Stack
 
-- **Frontend**: Next.js 15 with App Router.
-- **Backend**: API routes integrated with AI capabilities.
+- **Frontend**: Next.js 15 with App Router and Tailwind CSS for modern styling.
+- **Backend**: API routes with Gemini for AI-powered course content generation.
+- **Video Integration**: YouTube Data API v3 for embedding relevant videos into courses.
+- **Styling**: Tailwind CSS for responsive design.
 - **Authentication**: Clerk integration for user management.
 - **Deployment**: Vercel for seamless hosting and scaling.
 - **Database**: PostgreSQL with Drizzle ORM.
+
 ---
 
 ## Getting Started
@@ -42,13 +46,21 @@ AI Course Generator is a web application built with **Next.js** to create and ma
    npm install
    ```
 
-3. Run the development server:
+3. Set up environment variables:
+   - Add your **Gemini API key** and **YouTube Data API v3 key** in an `.env` file:
+
+     ```bash
+     GEMINI_API_KEY=your-gemini-api-key
+     YOUTUBE_API_KEY=your-youtube-api-key
+     ```
+
+4. Run the development server:
 
    ```bash
    npm run dev
    ```
 
-4. Open your browser and navigate to:
+5. Open your browser and navigate to:
 
    ```
    http://localhost:3000
@@ -79,5 +91,7 @@ Contributions are welcome! Feel free to:
 - **Live Application**: [SeedOfCode AI Course Generator](https://seedofcode-ai-course-generator.vercel.app/)  
 
 ---
+
 `Thank You :)`
+
 ---

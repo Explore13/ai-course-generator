@@ -85,7 +85,7 @@ function CourseStart({ params }) {
     <div>
       {/* Chapter list Side Bar : LHS */}
       <div
-        className={`fixed md:w-72 bg-white ${
+        className={`fixed md:w-72 overflow-scroll bg-white ${
           handleSidebar ? "block w-80 z-50" : "hidden"
         } md:block h-screen border-r shadow-sm`}
       >
