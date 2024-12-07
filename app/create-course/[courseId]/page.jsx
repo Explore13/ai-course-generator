@@ -27,17 +27,20 @@ function CourseLayout({ params }) {
     // console.log(Params); //courseId
     // console.log(user);
 
-    Params && GetCourse();
+    if (Params && user) {
+      GetCourse();
+    }
   }, [Params, user]);
 
   const GetCourse = async () => {
     try {
+      const params = await Params;
       const result = await db
         .select()
         .from(CourseList)
         .where(
           and(
-            eq(CourseList.courseId, Params?.courseId),
+            eq(CourseList.courseId, params?.courseId),
             eq(CourseList?.createdBy, user?.primaryEmailAddress?.emailAddress)
           )
         );
@@ -65,7 +68,32 @@ function CourseLayout({ params }) {
       for (const [index, chapter] of chapters.entries()) {
         // console.log(`Generating Chapter Content for ${chapter?.ChapterName}`);
 
-        const PROMPT = `Explain the concept in Detail on Topic: ${course?.name}, Chapter: ${chapter?.ChapterName}, in JSON Format with list of array with field as title, explanation on given chapter in detail, Code Example(Code field in <precode> format) if applicable. Remember that everything will be passed through JSON.parse() function.`;
+        const PROMPT = `
+        Generate detailed content for the following topic in strict JSON format:
+        - Topic: ${course?.name}
+        - Chapter: ${chapter?.ChapterName}
+
+        The response must be a valid JSON object containing an array of objects with the following fields:
+        1. "title": A short and descriptive title for the subtopic.
+        2. "explanation": A detailed explanation of the subtopic.
+        3. "codeExample": A code example (if applicable) wrapped in <precode> tags, or an empty string if no code example is available.
+
+        Ensure:
+        - Proper escaping of special characters.
+        - No trailing commas or malformed syntax.
+        - The response can be parsed directly using JSON.parse().
+
+        Example format:
+        {
+          "chapters": [
+            {
+              "title": "Subtopic Title",
+              "explanation": "Detailed explanation here.",
+              "codeExample": "<precode>Code example here</precode>"
+            }
+          ]
+        }
+      `;
 
         const result = await GenerateChapterContent_AI.sendMessage(PROMPT);
         // console.log(result?.response?.text());
@@ -114,12 +142,12 @@ function CourseLayout({ params }) {
       });
       router.replace("/create-course/" + course?.courseId + "/finish");
     } catch (error) {
-      // console.log(error);
+      console.log(error);
       toast({
         variant: "destructive",
         duration: 5000,
         title: "Uh oh! Something went wrong.",
-        description: error,
+        description: error?.message || "An unexpected error occurred!",
       });
     } finally {
       setLoading(false);
