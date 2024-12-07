@@ -65,6 +65,19 @@ function CourseLayout({ params }) {
 
       const includeVideo = course?.includeVideo;
       // console.log("IncludeVideo : " + includeVideo);
+
+      // Delete previous content if generated and got any error
+      const checkPreviousContent = await db
+        .select()
+        .from(Chapters)
+        .where(eq(Chapters.courseId, course?.courseId));
+      if (checkPreviousContent.length > 0) {
+        const chapterResponse = await db
+          .delete(Chapters)
+          .where(eq(Chapters.courseId, course?.courseId))
+          .returning({ id: Chapters?.id });
+      }
+
       for (const [index, chapter] of chapters.entries()) {
         // console.log(`Generating Chapter Content for ${chapter?.ChapterName}`);
 
@@ -85,6 +98,7 @@ function CourseLayout({ params }) {
 
         Example format:
         {
+          "title": "Topic Title",
           "chapters": [
             {
               "title": "Subtopic Title",
@@ -149,6 +163,7 @@ function CourseLayout({ params }) {
         title: "Uh oh! Something went wrong.",
         description: error?.message || "An unexpected error occurred!",
       });
+      await GetCourse();
     } finally {
       setLoading(false);
     }
