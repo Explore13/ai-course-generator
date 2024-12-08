@@ -4,7 +4,7 @@ import { CourseList } from "@/configs/schema";
 import React, { useEffect, useState } from "react";
 import CourseCard from "../_components/CourseCard";
 import { Button } from "@/components/ui/button";
-import { desc } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { useToast } from "@/hooks/use-toast";
 
 function Explore() {
@@ -27,6 +27,7 @@ function Explore() {
       const result = await db
         .select()
         .from(CourseList)
+        .where(eq(CourseList.publish, true))
         .orderBy(desc(CourseList.id));
       // console.log(result);
       setCourseList(result);
