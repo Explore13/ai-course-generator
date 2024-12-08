@@ -9,6 +9,7 @@ import { deleteObject, ref } from "firebase/storage";
 import { storage } from "@/configs/firebaseConfig";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 
 function CourseCard({ course, refreshData, displayUser = false }) {
   const { toast } = useToast();
@@ -68,7 +69,13 @@ function CourseCard({ course, refreshData, displayUser = false }) {
 
   return (
     <div className="shadow-sm rounded-lg border p-2 hover:scale-105 transition-all cursor-pointer mt-4">
-      <Link href={`/course/${course.courseId}`}>
+      <Link
+        href={
+          course?.publish
+            ? `/course/${course.courseId}`
+            : `/create-course/${course?.courseId}`
+        }
+      >
         <Image
           src={course?.courseBanner}
           alt="course"
@@ -97,6 +104,14 @@ function CourseCard({ course, refreshData, displayUser = false }) {
             <HiOutlineBookOpen />
             {course?.courseOutput?.NoOfChapters} Chapters
           </h2>
+
+          {!displayUser && course?.publish == false && (
+            <Link href={`/create-course/${course?.courseId}`}>
+              <h2 className="rounded-sm hidden md:block hover:bg-red-600  bg-red-500 text-white text-sm p-1">
+                Draft
+              </h2>
+            </Link>
+          )}
           <h2 className=" rounded-sm bg-primary/40 text-primary text-sm p-1">
             {course?.level}
           </h2>
@@ -113,6 +128,16 @@ function CourseCard({ course, refreshData, displayUser = false }) {
           />
           <h2>{course?.userName}</h2>
         </div>
+      )}
+
+      {!displayUser && course?.publish == false && (
+        <Link href={`/create-course/${course?.courseId}`}>
+          <div className="flex items-center justify-center mt-2 md:hidden">
+            <h2 className="rounded-sm hover:bg-red-600  bg-red-500 text-white text-sm p-1">
+              Draft
+            </h2>
+          </div>
+        </Link>
       )}
     </div>
   );

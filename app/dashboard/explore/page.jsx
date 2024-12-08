@@ -43,7 +43,7 @@ function Explore() {
   };
   return (
     <div>
-      <h2 className="font-bold text-3xl">Explore More Projects</h2>
+      <h2 className="font-bold text-3xl">Explore More Courses</h2>
       <p className="text-sm text-gray-500">
         Explore more projects build with AI by other users.
       </p>
