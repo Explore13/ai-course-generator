@@ -9,6 +9,8 @@ const getVideos = async (query) => {
     key: process.env.NEXT_PUBLIC_YOUTUBE_API_KEY,
     q: query,
     type: "video",
+    videoEmbeddable: true,
+    relevanceLanguage: "en",
   };
 
   const result = await axios.get(YOUTUBE_BASE_URL + "/search", { params });
