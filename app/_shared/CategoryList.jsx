@@ -17,5 +17,17 @@ export default [
         icon:'/interview.png',
         prompt:'',
     },
-
+    {
+        id:4,
+        name:'Deployment',
+        icon:'/deploy.png',
+        prompt:'',
+    },
+    {
+        id:5,
+        name:'Others',
+        icon:'/interview.png',
+        prompt:'',
+    },
+    
 ]

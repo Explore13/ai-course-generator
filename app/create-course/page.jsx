@@ -56,7 +56,11 @@ function CreateCourse() {
 
   const checkStatus = () => {
     // if (userCourseInput?.length == 0) return true;
-    if (activeIndex === 0 && !userCourseInput?.category) return true;
+    if (
+      activeIndex === 0 &&
+      (!userCourseInput?.category || userCourseInput?.category == "Others")
+    )
+      return true;
     if (activeIndex === 1 && !userCourseInput?.topic) return true;
     if (
       activeIndex === 2 &&

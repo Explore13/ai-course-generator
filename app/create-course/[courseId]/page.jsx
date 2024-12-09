@@ -92,8 +92,13 @@ function CourseLayout({ params }) {
         3. "codeExample": A code example (if applicable) wrapped in <precode> tags, or an empty string if no code example is available.
 
         Ensure:
+        - The JSON is valid and follows the specified format.
+        - The JSON is properly formatted with no syntax errors.
+        - The JSON contains the required fields.
+        - The JSON contains the correct data types.
         - Proper escaping of special characters.
         - No trailing commas or malformed syntax.
+        - The JSON is properly nested and structured.
         - The response can be parsed directly using JSON.parse().
 
         Example format:

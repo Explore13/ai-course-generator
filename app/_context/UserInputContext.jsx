@@ -8,4 +8,5 @@ export const UserInputContext = createContext({
   level: "",
   noOfChapters: "",
   topic: "",
+  activeInput: false,
 });
