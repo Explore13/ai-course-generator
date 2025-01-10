@@ -128,7 +128,7 @@ function CourseLayout({ params }) {
             course?.name + ":" + chapter?.ChapterName
           );
 
-          console.log(resp);
+          // console.log(resp);
 
           // console.log(resp[0]?.id?.videoId);
           videoId = [
@@ -136,7 +136,7 @@ function CourseLayout({ params }) {
             resp[1]?.id?.videoId,
             resp[2]?.id?.videoId,
           ];
-          console.log(videoId);
+          // console.log(videoId);
         }
         // Save Chapter Content + Video URL
 

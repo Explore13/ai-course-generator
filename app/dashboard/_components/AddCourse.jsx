@@ -1,6 +1,7 @@
 "use client";
 import { UserCourseListContext } from "@/app/_context/UserCourseListContext";
 import { Button } from "@/components/ui/button";
+import TypingAnimation from "@/components/ui/typing-animation";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
