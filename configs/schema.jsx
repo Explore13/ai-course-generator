@@ -20,5 +20,5 @@ export const Chapters = pgTable("chapters", {
   courseId: varchar("courseId").notNull(),
   chapterId: varchar("chapterId").notNull(),
   content: json("content").notNull(),
-  videoId: varchar("videoId"),
+  videoId: json("videoId").notNull().$default("[]"),
 });

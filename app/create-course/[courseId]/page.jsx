@@ -128,9 +128,15 @@ function CourseLayout({ params }) {
             course?.name + ":" + chapter?.ChapterName
           );
 
+          console.log(resp);
+
           // console.log(resp[0]?.id?.videoId);
-          videoId = resp[0]?.id?.videoId;
-          // console.log(videoId);
+          videoId = [
+            resp[0]?.id?.videoId,
+            resp[1]?.id?.videoId,
+            resp[2]?.id?.videoId,
+          ];
+          console.log(videoId);
         }
         // Save Chapter Content + Video URL
 

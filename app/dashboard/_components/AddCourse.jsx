@@ -10,6 +10,7 @@ function AddCourse() {
   const { user } = useUser();
   const { userCourseList, setUserCourseList } = useContext(
     UserCourseListContext
+    
   );
   return (
     <div className="flex justify-between items-center">

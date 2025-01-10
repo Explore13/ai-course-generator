@@ -177,6 +177,9 @@ function CreateCourse() {
                 `}
                 ></div>
               )}
+              <div>
+      
+              </div>
             </div>
           ))}
         </div>
