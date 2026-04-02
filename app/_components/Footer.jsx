@@ -3,7 +3,9 @@ import React from "react";
 function Footer() {
   return (
     <footer className="flex flex-col justify-between items-center md:flex-row gap-2 w-full p-5">
-      <div className="text-center">Copyright © 2025 by Surya Ghosh.</div>
+      <div className="text-center">
+        Copyright © {new Date().getFullYear()} by Surya Ghosh.
+      </div>
 
       <div className="flex items-center gap-1">
         <a
