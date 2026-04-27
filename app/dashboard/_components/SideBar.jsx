@@ -74,15 +74,15 @@ function SideBar() {
       </ul>
 
       <div className="absolute bottom-10 w-[80%]">
-        <Progress value={(userCourseList?.length / 5) * 100} />
+        <Progress value={(userCourseList?.length / 10) * 100} />
 
         <h2 className="text-sm my-2">
-          {userCourseList?.length} Out of 5 Course Created
+          {userCourseList?.length} Out of 10 Course Created
         </h2>
         <Link href="/dashboard/upgrade">
           <h2
             className={`text-xs hover:underline text-gray-700 ${
-              (userCourseList?.length / 5) * 100 >= 60 && "text-blue-700"
+              (userCourseList?.length / 10) * 100 >= 60 && "text-blue-700"
             }`}
           >
             Upgrade your plan for unlimited course generation

@@ -110,7 +110,7 @@ function CreateCourse() {
         description: "Course Layout has been generated successfully!",
       });
     } catch (error) {
-      // console.log(error);
+      console.log(error);
       toast({
         variant: "destructive",
         duration: 3000,

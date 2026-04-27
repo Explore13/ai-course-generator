@@ -8,6 +8,13 @@
       "when": 1732558428295,
       "tag": "0000_lonely_santa_claus",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1775154822336,
+      "tag": "0001_steady_nicolaos",
+      "breakpoints": true
     }
   ]
 }

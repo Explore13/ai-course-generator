@@ -11,7 +11,6 @@ function AddCourse() {
   const { user } = useUser();
   const { userCourseList, setUserCourseList } = useContext(
     UserCourseListContext
-    
   );
   return (
     <div className="flex justify-between items-center">
@@ -25,7 +24,7 @@ function AddCourse() {
       </div>
       <Link
         href={
-          userCourseList?.length >= 5 ? "/dashboard/upgrade" : "/create-course"
+          userCourseList?.length >= 10 ? "/dashboard/upgrade" : "/create-course"
         }
       >
         <Button>+ Create AI Course</Button>

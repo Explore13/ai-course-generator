@@ -81,10 +81,10 @@ function MobileSideBar({ handleMobileSidebar }) {
       </ul>
 
       <div className="absolute bottom-10 w-[80%]">
-        <Progress value={(userCourseList?.length / 5) * 100} />
+        <Progress value={(userCourseList?.length / 10) * 100} />
 
         <h2 className="text-sm my-2">
-          {userCourseList?.length} Out of 5 Course Created
+          {userCourseList?.length} Out of 10 Course Created
         </h2>
         <h2 className="text-xs text-gray-700">
           Upgrade your plan for unlimited course generation
