@@ -11,7 +11,7 @@ const connectionString =
 
 if (!connectionString) {
   throw new Error(
-    "No database connection string found. Set DB_CONNECTION_STRING, DATABASE_URL, POSTGRES_URL, or NEON_DATABASE_URL."
+    "No database connection string found. Set DB_CONNECTION_STRING, DATABASE_URL, POSTGRES_URL, or NEON_DATABASE_URL.",
   );
 }
 
