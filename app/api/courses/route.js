@@ -33,8 +33,9 @@ export async function GET(request) {
 
     return NextResponse.json(result);
   } catch (error) {
+    console.error("Failed to load courses", error);
     return NextResponse.json(
-      { message: "Failed to load courses" },
+      { message: error?.message || "Failed to load courses" },
       { status: 500 },
     );
   }

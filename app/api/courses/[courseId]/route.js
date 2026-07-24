@@ -52,6 +52,7 @@ export async function GET(request, { params }) {
 
     return NextResponse.json({ course });
   } catch (error) {
+    console.error("Failed to load course", error);
     return NextResponse.json(
       { message: error?.message || "Failed to load course" },
       { status: 500 },
