@@ -107,7 +107,7 @@ function CourseCard({ course, refreshData, displayUser = false }) {
       {displayUser && (
         <div className="flex items-center gap-2 mt-2 pl-1">
           <Image
-            src={course?.userProfileImage}
+            src={course?.userProfileImage || "/default_user_logo.png"}
             width={25}
             height={25}
             alt="user profile image"

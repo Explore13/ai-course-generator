@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   HiMiniSquares2X2,
   HiLightBulb,
@@ -11,6 +11,7 @@ import TopicDescription from "./_components/TopicDescription";
 import SelectOptions from "./_components/SelectOptions";
 import { UserInputContext } from "../_context/UserInputContext";
 import LoadingDialog from "./_components/LoadingDialog";
+import MaintenanceDialog from "@/app/_components/MaintenanceDialog";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -35,6 +36,12 @@ function CreateCourse() {
   ];
 
   const [loading, setLoading] = useState(false);
+  const [showMaintenance, setShowMaintenance] = useState(false);
+
+  // Show the maintenance dialog immediately when user lands on this page
+  useEffect(() => {
+    setShowMaintenance(true);
+  }, []);
 
   const { userCourseInput } = useContext(UserInputContext);
 
@@ -66,41 +73,8 @@ function CreateCourse() {
   const router = useRouter();
 
   const GenerateCourseLayout = async () => {
-    try {
-      setLoading(true);
-
-      const response = await fetch("/api/courses", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userCourseInput, user }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data?.message || "Unable to generate course layout");
-      }
-
-      toast({
-        variant: "success",
-        duration: 3000,
-        title: "Course Layout Generated Successfully!",
-        description: "Course Layout has been generated successfully!",
-      });
-
-      router.replace(`/create-course/${data?.courseId}`);
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        duration: 3000,
-        title: "Uh oh! Something went wrong.",
-        description: error?.message || "There was a problem with your request.",
-      });
-    } finally {
-      setLoading(false);
-    }
+    // Block course creation during maintenance
+    setShowMaintenance(true);
   };
 
   return (
@@ -167,6 +141,10 @@ function CreateCourse() {
         </div>
       </div>
       <LoadingDialog loading={loading} />
+      <MaintenanceDialog
+        open={showMaintenance}
+        onClose={() => setShowMaintenance(false)}
+      />
     </div>
   );
 }

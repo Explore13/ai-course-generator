@@ -42,6 +42,21 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
+  // ── MAINTENANCE GUARD ──────────────────────────────────────────────────────
+  // Course creation is temporarily disabled while we rebuild the platform.
+  // Remove this block after 5th September 2025.
+  return NextResponse.json(
+    {
+      maintenance: true,
+      message:
+        "We are currently rebuilding the AI Course Generator for a better experience. " +
+        "Course creation is paused until 5th September 2025. " +
+        "Your existing courses are still accessible.",
+    },
+    { status: 503 },
+  );
+  // ── END MAINTENANCE GUARD ──────────────────────────────────────────────────
+
   try {
     const { userCourseInput, user } = await request.json();
 

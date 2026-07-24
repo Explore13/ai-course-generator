@@ -1,17 +1,23 @@
 "use client";
 import { UserCourseListContext } from "@/app/_context/UserCourseListContext";
+import MaintenanceDialog from "@/app/_components/MaintenanceDialog";
 import { Button } from "@/components/ui/button";
-import TypingAnimation from "@/components/ui/typing-animation";
-import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@clerk/nextjs";
-import Link from "next/link";
-import React, { useContext } from "react";
+import { useRouter } from "next/navigation";
+import React, { useContext, useState } from "react";
 
 function AddCourse() {
   const { user } = useUser();
-  const { userCourseList, setUserCourseList } = useContext(
-    UserCourseListContext
-  );
+  const { userCourseList } = useContext(UserCourseListContext);
+  const router = useRouter();
+  const [showMaintenance, setShowMaintenance] = useState(false);
+
+  const handleCreateClick = (e) => {
+    // Always intercept and show maintenance dialog
+    e.preventDefault();
+    setShowMaintenance(true);
+  };
+
   return (
     <div className="flex justify-between items-center">
       <div>
@@ -22,13 +28,13 @@ function AddCourse() {
           Create new course with AI, Share with friends and Learn.
         </p>
       </div>
-      <Link
-        href={
-          userCourseList?.length >= 10 ? "/dashboard/upgrade" : "/create-course"
-        }
-      >
-        <Button>+ Create AI Course</Button>
-      </Link>
+
+      <Button onClick={handleCreateClick}>+ Create AI Course</Button>
+
+      <MaintenanceDialog
+        open={showMaintenance}
+        onClose={() => setShowMaintenance(false)}
+      />
     </div>
   );
 }
