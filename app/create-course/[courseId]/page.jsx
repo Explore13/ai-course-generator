@@ -6,6 +6,7 @@ import CourseDetail from "./_components/CourseDetail";
 import ChapterList from "./_components/ChapterList";
 import { Button } from "@/components/ui/button";
 import LoadingDialog from "../_components/LoadingDialog";
+import MaintenanceDialog from "@/app/_components/MaintenanceDialog";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
@@ -14,6 +15,7 @@ function CourseLayout({ params }) {
   const { user } = useUser();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showMaintenance, setShowMaintenance] = useState(false);
   const router = useRouter();
 
   const { toast } = useToast();
@@ -50,44 +52,8 @@ function CourseLayout({ params }) {
   };
 
   const GenerateChapterContent = async () => {
-    setLoading(true);
-
-    try {
-      const response = await fetch(`/api/courses/${course?.courseId}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          course,
-          includeVideo: course?.includeVideo,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data?.message || "Unable to generate chapter content");
-      }
-
-      toast({
-        variant: "success",
-        duration: 3000,
-        title: "Course Content Generated Successfully!",
-        description: "Course Content has been generated successfully!",
-      });
-      router.replace("/create-course/" + course?.courseId + "/finish");
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        duration: 5000,
-        title: "Uh oh! Something went wrong.",
-        description: error?.message || "An unexpected error occurred!",
-      });
-      await GetCourse();
-    } finally {
-      setLoading(false);
-    }
+    // Block chapter generation during maintenance
+    setShowMaintenance(true);
   };
 
   return (
@@ -103,6 +69,10 @@ function CourseLayout({ params }) {
           Generate Course Content
         </Button>
       </div>
+      <MaintenanceDialog
+        open={showMaintenance}
+        onClose={() => setShowMaintenance(false)}
+      />
     </>
   );
 }

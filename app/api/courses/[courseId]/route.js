@@ -124,6 +124,21 @@ export async function DELETE(request, { params }) {
 }
 
 export async function POST(request, { params }) {
+  // ── MAINTENANCE GUARD ──────────────────────────────────────────────────────
+  // Chapter content generation is temporarily disabled while we rebuild the platform.
+  // Remove this block after 5th September 2026.
+  return NextResponse.json(
+    {
+      maintenance: true,
+      message:
+        "We are currently rebuilding the AI Course Generator for a better experience. " +
+        "Course creation is paused until 5th September 2026. " +
+        "Your existing courses are still accessible.",
+    },
+    { status: 503 },
+  );
+  // ── END MAINTENANCE GUARD ──────────────────────────────────────────────────
+
   try {
     const courseId = params.courseId;
     const body = await request.json();
