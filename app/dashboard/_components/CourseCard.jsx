@@ -2,14 +2,10 @@ import Image from "next/image";
 import React from "react";
 import { HiOutlineBookOpen, HiEllipsisVertical } from "react-icons/hi2";
 import DropdownOption from "./DropdownOption";
-import { db } from "@/configs/db";
-import { Chapters, CourseList } from "@/configs/schema";
-import { eq } from "drizzle-orm";
 import { deleteObject, ref } from "firebase/storage";
 import { storage } from "@/configs/firebaseConfig";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
 
 function CourseCard({ course, refreshData, displayUser = false }) {
   const { toast } = useToast();
@@ -31,31 +27,22 @@ function CourseCard({ course, refreshData, displayUser = false }) {
         // console.log("Image Deleted");
       }
 
-      // Delete Course
-      const courseResponse = await db
-        .delete(CourseList)
-        .where(eq(CourseList.id, course?.id))
-        .returning({ id: CourseList?.id });
+      const response = await fetch(`/api/courses/${course?.courseId}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
 
-      // console.log("Course Deleted : " + courseResponse);
-
-      // Delete Chapters
-      const chapterResponse = await db
-        .delete(Chapters)
-        .where(eq(Chapters.courseId, course?.courseId))
-        .returning({ id: Chapters?.id });
-
-      // console.log("Chapters Deleted : " + chapterResponse);
-
-      if (courseResponse && chapterResponse) {
-        refreshData();
-        toast({
-          variant: "success",
-          duration: 3000,
-          title: "Course Deleted Successfully!",
-          description: "Course has been deleted successfully!",
-        });
+      if (!response.ok) {
+        throw new Error(data?.message || "Unable to delete course");
       }
+
+      refreshData();
+      toast({
+        variant: "success",
+        duration: 3000,
+        title: "Course Deleted Successfully!",
+        description: "Course has been deleted successfully!",
+      });
     } catch (error) {
       // console.log("Error during deletion : " + error);
       toast({

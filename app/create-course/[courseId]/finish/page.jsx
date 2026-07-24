@@ -1,8 +1,5 @@
 "use client";
-import { db } from "@/configs/db";
-import { CourseList } from "@/configs/schema";
 import { useUser } from "@clerk/nextjs";
-import { and, eq } from "drizzle-orm";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import CourseBasicInfo from "../_components/CourseBasicInfo";
@@ -30,25 +27,24 @@ function FinishScreen({ params }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    // console.log(Params); //courseId
-    // console.log(user);
-
     Params && GetCourse();
   }, [Params, user]);
 
   const GetCourse = async () => {
     try {
       const params = await Params;
-      const result = await db
-        .select()
-        .from(CourseList)
-        .where(
-          and(
-            eq(CourseList.courseId, Params?.courseId),
-            eq(CourseList?.createdBy, user?.primaryEmailAddress?.emailAddress)
-          )
-        );
-      if (result[0]?.publish == false) {
+      const response = await fetch(
+        `/api/courses/${params?.courseId}?email=${encodeURIComponent(
+          user?.primaryEmailAddress?.emailAddress || "",
+        )}`,
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.message || "Unable to load course");
+      }
+
+      if (data?.course?.publish == false) {
         router.replace("/create-course/" + params?.courseId);
         toast({
           variant: "destructive",
@@ -58,20 +54,20 @@ function FinishScreen({ params }) {
         });
         return;
       }
-      setCourse(result[0]);
+
+      setCourse(data?.course);
       setLoading(false);
-      // console.log("Course data:", result[0]);
     } catch (error) {
-      // console.error("Error fetching course:", error);
       toast({
         variant: "destructive",
         duration: 3000,
         title: "Uh oh! Something went wrong.",
-        description: "There was a problem with your request.",
+        description: error?.message || "There was a problem with your request.",
       });
       setLoading(false);
     }
   };
+
   return (
     <div>
       {loading && !course ? (
@@ -119,7 +115,7 @@ function FinishScreen({ params }) {
                 await navigator.clipboard.writeText(
                   process.env.NEXT_PUBLIC_HOST_NAME +
                     "/course/" +
-                    course?.courseId
+                    course?.courseId,
                 )
               }
             />

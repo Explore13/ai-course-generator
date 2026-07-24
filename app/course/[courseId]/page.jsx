@@ -3,10 +3,7 @@ import ChapterList from "@/app/create-course/[courseId]/_components/ChapterList"
 import CourseBasicInfo from "@/app/create-course/[courseId]/_components/CourseBasicInfo";
 import CourseDetail from "@/app/create-course/[courseId]/_components/CourseDetail";
 import Header from "@/app/dashboard/_components/Header";
-import { db } from "@/configs/db";
-import { CourseList } from "@/configs/schema";
 import { useToast } from "@/hooks/use-toast";
-import { eq } from "drizzle-orm";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import Skeleton from "react-loading-skeleton";
@@ -18,18 +15,23 @@ function Course({ params }) {
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+
   useEffect(() => {
-    params && GetCourse();
-  }, [params]);
+    if (Params) {
+      GetCourse();
+    }
+  }, [Params]);
 
   const GetCourse = async () => {
     try {
-      const result = await db
-        .select()
-        .from(CourseList)
-        .where(eq(CourseList.courseId, Params?.courseId));
+      const response = await fetch(`/api/courses/${Params?.courseId}`);
+      const data = await response.json();
 
-      if (result[0]?.publish == false) {
+      if (!response.ok) {
+        throw new Error(data?.message || "Unable to load course");
+      }
+
+      if (data?.course?.publish == false) {
         router.replace("/dashboard");
         toast({
           variant: "destructive",
@@ -38,20 +40,20 @@ function Course({ params }) {
         });
         return;
       }
-      // console.log(result[0]);
-      setCourse(result[0]);
+
+      setCourse(data?.course);
       setLoading(false);
     } catch (error) {
-      // console.log(error);
       toast({
         variant: "destructive",
         duration: 3000,
         title: "Uh oh! Something went wrong.",
-        description: "There was a problem with your request.",
+        description: error?.message || "There was a problem with your request.",
       });
       setLoading(false);
     }
   };
+
   return (
     <div>
       <Header />

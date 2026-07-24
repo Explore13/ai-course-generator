@@ -10,9 +10,6 @@ import {
   ref,
   uploadBytes,
 } from "firebase/storage";
-import { db } from "@/configs/db";
-import { CourseList } from "@/configs/schema";
-import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 
@@ -30,7 +27,7 @@ function CourseBasicInfo({ course, refreshData, edit = true }) {
         const filePath = course?.courseBanner
           .replace(
             "https://firebasestorage.googleapis.com/v0/b/explorer-1844f.firebasestorage.app/o/",
-            ""
+            "",
           )
           .split("?")[0];
         const fileRef = ref(storage, decodeURIComponent(filePath));
@@ -55,11 +52,22 @@ function CourseBasicInfo({ course, refreshData, edit = true }) {
       const imageLink = await getDownloadURL(storageRef);
       // console.log("Image Link Generated!", imageLink);
 
-      const result = await db
-        .update(CourseList)
-        .set({ courseBanner: imageLink })
-        .where(eq(CourseList.id, course?.id));
-      // console.log(result);
+      const response = await fetch(`/api/courses/${course?.courseId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type: "update-banner",
+          payload: { courseBanner: imageLink },
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.message || "Unable to update course banner");
+      }
+
       refreshData(true);
     } catch (error) {
       // console.log(error);

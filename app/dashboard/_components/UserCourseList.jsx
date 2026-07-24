@@ -1,8 +1,5 @@
 "use client";
-import { db } from "@/configs/db";
-import { CourseList } from "@/configs/schema";
 import { useUser } from "@clerk/nextjs";
-import { desc, eq } from "drizzle-orm";
 import React, { useContext, useEffect, useState } from "react";
 import CourseCard from "./CourseCard";
 import { UserCourseListContext } from "@/app/_context/UserCourseListContext";
@@ -14,7 +11,7 @@ function UserCourseList() {
   const { toast } = useToast();
 
   const { userCourseList, setUserCourseList } = useContext(
-    UserCourseListContext
+    UserCourseListContext,
   );
 
   const { user } = useUser();
@@ -25,15 +22,17 @@ function UserCourseList() {
 
   const getUserCourses = async () => {
     try {
-      const result = await db
-        .select()
-        .from(CourseList)
-        .where(
-          eq(CourseList.createdBy, user?.primaryEmailAddress?.emailAddress)
-        )
-        .orderBy(desc(CourseList.id));
+      const response = await fetch(
+        `/api/courses?email=${encodeURIComponent(
+          user?.primaryEmailAddress?.emailAddress || "",
+        )}`,
+      );
+      const result = await response.json();
 
-      // console.log(result);
+      if (!response.ok) {
+        throw new Error(result?.message || "Unable to load your courses");
+      }
+
       setCourseList(result);
       setUserCourseList(result);
       localStorage.setItem("userCourseList", JSON.stringify(result));
@@ -42,7 +41,7 @@ function UserCourseList() {
         variant: "destructive",
         duration: 3000,
         title: "Uh oh! Something went wrong.",
-        description: "There was a problem with your request.",
+        description: error?.message || "There was a problem with your request.",
       });
     } finally {
       setIsLoading(false);

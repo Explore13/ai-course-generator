@@ -13,9 +13,6 @@ import { HiMiniPencilSquare } from "react-icons/hi2";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { db } from "@/configs/db";
-import { CourseList } from "@/configs/schema";
-import { eq } from "drizzle-orm";
 import { useToast } from "@/hooks/use-toast";
 
 function EditCourseBasicInfo({ course, refreshData }) {
@@ -32,13 +29,23 @@ function EditCourseBasicInfo({ course, refreshData }) {
     try {
       course.courseOutput.CourseName = name;
       course.courseOutput.Description = description;
-      const result = await db
-        .update(CourseList)
-        .set({ courseOutput: course?.courseOutput })
-        .where(eq(CourseList?.id, course?.id))
-        .returning({ id: CourseList.id });
 
-      // console.log(result);
+      const response = await fetch(`/api/courses/${course?.courseId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type: "update-course",
+          payload: { courseOutput: course?.courseOutput },
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.message || "Unable to update course");
+      }
+
       refreshData(true);
       toast({
         variant: "success",

@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   HiMiniSquares2X2,
   HiLightBulb,
@@ -10,11 +10,7 @@ import SelectCategory from "./_components/SelectCategory";
 import TopicDescription from "./_components/TopicDescription";
 import SelectOptions from "./_components/SelectOptions";
 import { UserInputContext } from "../_context/UserInputContext";
-import { GenerateCourseLayout_AI } from "@/configs/AiModel";
 import LoadingDialog from "./_components/LoadingDialog";
-import { db } from "@/configs/db";
-import { CourseList } from "@/configs/schema";
-import uuid4 from "uuid4";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -40,22 +36,13 @@ function CreateCourse() {
 
   const [loading, setLoading] = useState(false);
 
-  const { userCourseInput, setUserCourseInput } = useContext(UserInputContext);
+  const { userCourseInput } = useContext(UserInputContext);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const { user } = useUser();
   const { toast } = useToast();
 
-  // useEffect(() => {
-  //   // console.log(userCourseInput);
-  // }, [userCourseInput]);
-
-  /**
-   *  Used to check Next Button enabled or disabled
-   */
-
   const checkStatus = () => {
-    // if (userCourseInput?.length == 0) return true;
     if (
       activeIndex === 0 &&
       (!userCourseInput?.category || userCourseInput?.category == "Others")
@@ -77,81 +64,47 @@ function CreateCourse() {
   };
 
   const router = useRouter();
+
   const GenerateCourseLayout = async () => {
     try {
       setLoading(true);
-      const BASIC_PROMPT =
-        "Generate A Course Tutorial on Following Details With field as Course Name, Description, Along with Chapter Name, about, Duration : \n";
 
-      const USER_INPUT_PROMPT =
-        "Category: " +
-        userCourseInput?.category +
-        ", Topic: " +
-        userCourseInput?.topic +
-        ", Level:" +
-        userCourseInput?.level +
-        ",Duration:" +
-        userCourseInput?.duration +
-        ",NoOfChapters:" +
-        userCourseInput?.noOfChapters +
-        ", in JSON format";
+      const response = await fetch("/api/courses", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userCourseInput, user }),
+      });
 
-      const FINAL_PROMPT = BASIC_PROMPT + USER_INPUT_PROMPT;
-      // console.log(FINAL_PROMPT);
+      const data = await response.json();
 
-      const result = await GenerateCourseLayout_AI.sendMessage(FINAL_PROMPT);
-      // console.log(result.response.text());
-      // console.log(JSON.parse(result.response.text()));
-      SaveCourseLayoutInDB(JSON.parse(result.response?.text()));
+      if (!response.ok) {
+        throw new Error(data?.message || "Unable to generate course layout");
+      }
+
       toast({
         variant: "success",
         duration: 3000,
         title: "Course Layout Generated Successfully!",
         description: "Course Layout has been generated successfully!",
       });
+
+      router.replace(`/create-course/${data?.courseId}`);
     } catch (error) {
-      console.log(error);
       toast({
         variant: "destructive",
         duration: 3000,
         title: "Uh oh! Something went wrong.",
-        description: "There was a problem with your request.",
+        description: error?.message || "There was a problem with your request.",
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const SaveCourseLayoutInDB = async (courseLayout) => {
-    try {
-      var id = uuid4();
-      const result = await db.insert(CourseList).values({
-        courseId: id,
-        name: userCourseInput?.topic,
-        level: userCourseInput?.level,
-        category: userCourseInput?.category,
-        courseOutput: courseLayout,
-        createdBy: user?.primaryEmailAddress?.emailAddress,
-        userName: user?.fullName,
-        includeVideo: userCourseInput?.displayVideo,
-        userProfileImage: user?.imageUrl,
-      });
-
-      // console.log("Course Layout Saved in DB", result.command);
-      router.replace(`/create-course/${id}`);
-    } catch (error) {
-      // console.log(error);
-      toast({
-        variant: "destructive",
-        duration: 3000,
-        title: "Uh oh! Something went wrong.",
-        description: "There was a problem with your request.",
-      });
-    }
-  };
   return (
     <div>
-      {/* Stepper */}
       <div className="flex flex-col justify-center items-center mt-10">
         <h2 className="text-4xl text-primary font-medium">Create Course</h2>
 
@@ -177,20 +130,15 @@ function CreateCourse() {
                 `}
                 ></div>
               )}
-              <div>
-      
-              </div>
             </div>
           ))}
         </div>
       </div>
 
       <div className="px-10 md:px-20 lg:px-44 mt-10">
-        {/* Components */}
         {activeIndex == 0 && <SelectCategory />}
         {activeIndex == 1 && <TopicDescription />}
         {activeIndex == 2 && <SelectOptions />}
-        {/* Next and Previous Button */}
 
         <div className="flex justify-between mt-10 mb-20">
           <Button

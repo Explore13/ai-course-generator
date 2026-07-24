@@ -1,10 +1,6 @@
 "use client";
-import { db } from "@/configs/db";
-import { CourseList } from "@/configs/schema";
 import React, { useEffect, useState } from "react";
 import CourseCard from "../_components/CourseCard";
-import { Button } from "@/components/ui/button";
-import { desc, eq } from "drizzle-orm";
 import { useToast } from "@/hooks/use-toast";
 
 function Explore() {
@@ -17,27 +13,21 @@ function Explore() {
   }, []); // set dependency array value to pageIndex
 
   const GetAllCourses = async () => {
-    // const result = await db
-    //   .select()
-    //   .from(CourseList)
-    //   .limit(9)
-    //   .offset(pageIndex * 9);
-
     try {
-      const result = await db
-        .select()
-        .from(CourseList)
-        .where(eq(CourseList.publish, true))
-        .orderBy(desc(CourseList.id));
-      // console.log(result);
+      const response = await fetch("/api/courses?published=true");
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result?.message || "Unable to load courses");
+      }
+
       setCourseList(result);
     } catch (error) {
-      // console.log(error);
       toast({
         variant: "destructive",
         duration: 3000,
         title: "Uh oh! Something went wrong.",
-        description: "There was a problem with your request.",
+        description: error?.message || "There was a problem with your request.",
       });
     }
   };
