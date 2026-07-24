@@ -22,7 +22,7 @@ function CourseCard({ course, refreshData, displayUser = false }) {
         const filePath = course?.courseBanner
           .replace(
             "https://firebasestorage.googleapis.com/v0/b/explorer-1844f.firebasestorage.app/o/",
-            ""
+            "",
           )
           .split("?")[0];
         const fileRef = ref(storage, decodeURIComponent(filePath));
