@@ -49,10 +49,12 @@ export async function POST(request) {
       notifyMe: true,
     });
 
-    // Send confirmation email (in the background, don't fail the request if it fails)
-    sendConfirmationEmail(email, user.firstName || "there").catch((err) => {
+    // Send confirmation email (must await in serverless environments)
+    try {
+      await sendConfirmationEmail(email, user.firstName || "there");
+    } catch (err) {
       console.error("Failed to send confirmation email:", err);
-    });
+    }
 
     return NextResponse.json({ success: true, alreadyRegistered: false });
   } catch (error) {
