@@ -11,11 +11,22 @@ export default function MaintenanceDialog({ open, onClose }) {
   const { toast } = useToast();
 
   // Handle scroll lock when dialog opens/closes
+  // Fetch registration status on open
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
+      // Check if already registered
+      fetch("/api/launch-notification")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.registered) {
+            setNotifyState("success");
+          }
+        })
+        .catch((err) => console.error("Failed to check registration status", err));
     } else {
       document.body.style.overflow = "";
+      // Reset state on close if they didn't succeed, though they shouldn't lose success state
     }
     
     // Cleanup on unmount
@@ -113,19 +124,19 @@ export default function MaintenanceDialog({ open, onClose }) {
             {/* Top section: Image + Text */}
             <div className="flex flex-col md:flex-row gap-10 items-center md:items-center">
               {/* Left Image */}
-              <div className="w-full md:w-5/12 flex justify-center shrink-0">
+              <div className="w-full md:w-5/12 flex justify-center shrink-0 pt-4 md:pt-0">
                 <Image
                   src="/image_for_maintanance.png"
                   alt="Growing seed"
-                  width={380}
-                  height={450}
-                  className="object-contain"
+                  width={600}
+                  height={700}
+                  className="object-contain w-full h-auto max-w-[280px] md:max-w-[100%] scale-110 md:scale-125 transform origin-center"
                   priority
                 />
               </div>
 
               {/* Right Text Content */}
-              <div className="w-full md:w-7/12 flex flex-col gap-5 pt-2">
+              <div className="w-full md:w-7/12 flex flex-col gap-5 pt-2 relative z-10">
                 {/* Badge */}
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#f0fdf4] text-green-700 rounded-full w-fit font-medium text-sm">
                   <Sparkles size={16} className="text-yellow-500" />
@@ -213,10 +224,10 @@ export default function MaintenanceDialog({ open, onClose }) {
                   </>
                 )}
                 {notifyState === "success" && (
-                  <>
+                  <div className="flex items-center gap-3">
                     <Check size={24} className="text-green-500" />
-                    <span className="font-bold text-lg leading-none text-green-600">✓ You&apos;re on the list</span>
-                  </>
+                    <span className="font-bold text-lg leading-none text-green-600">You&apos;re on the list</span>
+                  </div>
                 )}
               </button>
 

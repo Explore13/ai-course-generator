@@ -4,6 +4,7 @@ import { db } from "@/configs/db";
 import { LaunchNotifications } from "@/configs/schema";
 import { eq } from "drizzle-orm";
 import nodemailer from "nodemailer";
+const path = require("path");
 
 export async function POST(request) {
   try {
@@ -73,12 +74,13 @@ async function sendConfirmationEmail(toEmail, firstName) {
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: parseInt(process.env.SMTP_PORT || "587"),
-    secure: process.env.SMTP_PORT === "465", 
+    secure: process.env.SMTP_PORT === "465",
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
     },
   });
+
 
   const mailOptions = {
     from: `"SeedofCode" <${process.env.SMTP_USER}>`,
@@ -86,17 +88,104 @@ async function sendConfirmationEmail(toEmail, firstName) {
     subject: "🌱 You're on the SeedofCode Early Access List",
     text: `Hi ${firstName},\n\nYou're officially on the SeedofCode Early Access list.\nWe'll notify you as soon as the new experience launches.\n\nLaunch Date\n5 September 2026\n\nThank you for being part of the journey.\nBuild. Learn. Grow.\n— Surya\nSeedofCode`,
     html: `
-      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-        <p>Hi ${firstName},</p>
-        <p>You're officially on the SeedofCode Early Access list.</p>
-        <p>We'll notify you as soon as the new experience launches.</p>
-        <br/>
-        <p><strong>Launch Date</strong><br/>5 September 2026</p>
-        <br/>
-        <p>Thank you for being part of the journey.<br/>Build. Learn. Grow.</p>
-        <p>— Surya<br/>SeedofCode</p>
-      </div>
-    `,
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SeedofCode Early Access</title>
+  </head>
+  <body style="margin:0; padding:0; background-color:#f4f6f4; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f4; padding:32px 16px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background-color:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+
+            <!-- Header / Logo -->
+            <tr>
+              <td align="center" style="background-color:#0d0d0d; padding:32px 24px;">
+                <img src="cid:seedofcode-logo" alt="SeedofCode" width="220" style="display:block; max-width:220px; height:auto;" />
+              </td>
+            </tr>
+
+            <!-- Accent bar -->
+            <tr>
+              <td style="height:4px; background: linear-gradient(90deg, #2e7d32, #66bb6a);"></td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td style="padding:40px 40px 24px 40px;">
+                <p style="margin:0 0 8px 0; font-size:14px; letter-spacing:1px; text-transform:uppercase; color:#2e7d32; font-weight:600;">
+                  Early Access Confirmed
+                </p>
+                <h1 style="margin:0 0 20px 0; font-size:24px; line-height:1.3; color:#1a1a1a; font-weight:700;">
+                  Hi ${firstName}, you're on the list 🌱
+                </h1>
+                <p style="margin:0 0 16px 0; font-size:15px; line-height:1.6; color:#4a4a4a;">
+                  You're officially on the <strong>SeedofCode Early Access</strong> list. We'll notify you the moment the new experience launches.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Launch date card -->
+            <tr>
+              <td style="padding:0 40px 24px 40px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1f8f1; border:1px solid #d7ead7; border-radius:10px;">
+                  <tr>
+                    <td style="padding:20px 24px;" align="center">
+                      <p style="margin:0 0 4px 0; font-size:12px; letter-spacing:1px; text-transform:uppercase; color:#2e7d32; font-weight:600;">
+                        Launch Date
+                      </p>
+                      <p style="margin:0; font-size:20px; color:#1a1a1a; font-weight:700;">
+                        5 September 2026
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Closing -->
+            <tr>
+              <td style="padding:0 40px 32px 40px;">
+                <p style="margin:0 0 16px 0; font-size:15px; line-height:1.6; color:#4a4a4a;">
+                  Thank you for being part of the journey.
+                </p>
+                <p style="margin:0 0 24px 0; font-size:15px; line-height:1.6; color:#1a1a1a; font-weight:600;">
+                  Build. Learn. Grow.
+                </p>
+                <p style="margin:0; font-size:14px; line-height:1.6; color:#4a4a4a;">
+                  — Surya<br/>
+                  <span style="color:#2e7d32; font-weight:600;">SeedofCode</span>
+                </p>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td style="background-color:#fafafa; padding:20px 40px; border-top:1px solid #eeeeee;" align="center">
+                <p style="margin:0; font-size:12px; color:#9a9a9a; line-height:1.6;">
+                  You're receiving this because you signed up for SeedofCode Early Access.<br/>
+                  © ${new Date().getFullYear()} SeedofCode. All rights reserved.
+                </p>
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>
+  `,
+    attachments: [
+      {
+        filename: "seed-of-code-logo.png",
+        path: path.join(process.cwd(), "public", "seed-of-code-logo.png"),
+        cid: "seedofcode-logo", // referenced via cid: in the <img> tag above
+      },
+    ],
   };
 
   const info = await transporter.sendMail(mailOptions);
