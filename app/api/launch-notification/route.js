@@ -128,7 +128,7 @@ async function sendConfirmationEmail(toEmail, firstName) {
             <!-- Header / Logo -->
             <tr>
               <td align="center" style="background-color:#0d0d0d; padding:32px 24px;">
-                <img src="cid:seedofcode-logo" alt="SeedofCode" width="220" style="display:block; max-width:220px; height:auto;" />
+                <img src="https://legacy.seedofcode.dev/seed-of-code-logo.png" alt="SeedofCode" width="220" style="display:block; max-width:220px; height:auto;" />
               </td>
             </tr>
 
@@ -203,13 +203,6 @@ async function sendConfirmationEmail(toEmail, firstName) {
   </body>
   </html>
   `,
-    attachments: [
-      {
-        filename: "seed-of-code-logo.png",
-        path: path.join(process.cwd(), "public", "seed-of-code-logo.png"),
-        cid: "seedofcode-logo", // referenced via cid: in the <img> tag above
-      },
-    ],
   };
 
   const info = await transporter.sendMail(mailOptions);
