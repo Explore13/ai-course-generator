@@ -4,6 +4,7 @@ import { CourseList } from "@/configs/schema";
 import { desc, eq } from "drizzle-orm";
 import uuid4 from "uuid4";
 import { GenerateCourseLayout_AI } from "@/configs/AiModel";
+import { auth, currentUser } from "@clerk/nextjs/server";
 
 export const dynamic = "force-dynamic";
 
@@ -58,7 +59,15 @@ export async function POST(request) {
   // ── END MAINTENANCE GUARD ──────────────────────────────────────────────────
 
   try {
-    const { userCourseInput, user } = await request.json();
+    const userAuth = await auth();
+    const { userId } = userAuth;
+
+    if (!userId) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const clerkUser = await currentUser();
+    const { userCourseInput } = await request.json();
 
     const BASIC_PROMPT =
       "Generate A Course Tutorial on Following Details With field as Course Name, Description, Along with Chapter Name, about, Duration : \n";
@@ -89,10 +98,10 @@ export async function POST(request) {
         level: userCourseInput?.level,
         category: userCourseInput?.category,
         courseOutput: courseLayout,
-        createdBy: user?.primaryEmailAddress?.emailAddress,
-        userName: user?.fullName,
+        createdBy: clerkUser?.primaryEmailAddress?.emailAddress,
+        userName: clerkUser?.fullName,
         includeVideo: userCourseInput?.displayVideo,
-        userProfileImage: user?.imageUrl,
+        userProfileImage: clerkUser?.imageUrl,
       })
       .returning();
 

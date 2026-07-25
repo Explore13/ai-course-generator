@@ -4,11 +4,19 @@ import { Chapters, CourseList } from "@/configs/schema";
 import { and, eq } from "drizzle-orm";
 import { GenerateChapterContent_AI } from "@/configs/AiModel";
 import getVideos from "@/configs/service";
+import { auth, currentUser } from "@clerk/nextjs/server";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request, { params }) {
   try {
+    const userAuth = await auth();
+    if (!userAuth.userId) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+    const clerkUser = await currentUser();
+    const userEmail = clerkUser?.primaryEmailAddress?.emailAddress;
+
     const courseId = params.courseId;
     const { searchParams } = new URL(request.url);
     const email = searchParams.get("email");
@@ -18,13 +26,16 @@ export async function GET(request, { params }) {
     let courseResult;
 
     if (email) {
+      if (email !== userEmail) {
+        return NextResponse.json({ message: "Unauthorized access to these courses" }, { status: 403 });
+      }
       courseResult = await db
         .select()
         .from(CourseList)
         .where(
           and(
             eq(CourseList.courseId, courseId),
-            eq(CourseList.createdBy, email),
+            eq(CourseList.createdBy, userEmail),
           ),
         );
     } else {
@@ -62,6 +73,11 @@ export async function GET(request, { params }) {
 
 export async function PATCH(request, { params }) {
   try {
+    const userAuth = await auth();
+    if (!userAuth.userId) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
     const courseId = params.courseId;
     const body = await request.json();
     const { type, payload } = body;
@@ -110,6 +126,11 @@ export async function PATCH(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
+    const userAuth = await auth();
+    if (!userAuth.userId) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
     const courseId = params.courseId;
     await db.delete(Chapters).where(eq(Chapters.courseId, courseId));
     await db.delete(CourseList).where(eq(CourseList.courseId, courseId));

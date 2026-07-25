@@ -15,6 +15,13 @@
       "when": 1775154822336,
       "tag": "0001_steady_nicolaos",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784938516667,
+      "tag": "0002_famous_obadiah_stane",
+      "breakpoints": true
     }
   ]
 }

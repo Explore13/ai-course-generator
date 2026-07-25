@@ -1,10 +1,29 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { Sparkles, Info, BookOpen, CalendarDays, Globe, Bell, HeartHandshake, X } from "lucide-react";
+import { Sparkles, Info, BookOpen, CalendarDays, Globe, Bell, HeartHandshake, X, Check } from "lucide-react";
 import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 export default function MaintenanceDialog({ open, onClose }) {
+  const [notifyState, setNotifyState] = useState("default"); // default | loading | success
+  const { toast } = useToast();
+
+  // Handle scroll lock when dialog opens/closes
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
   // Close on Escape key
   useEffect(() => {
     if (!open) return;
@@ -14,6 +33,53 @@ export default function MaintenanceDialog({ open, onClose }) {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [open, onClose]);
+
+  const handleNotifyClick = async () => {
+    if (notifyState === "success") return;
+    
+    setNotifyState("loading");
+    
+    try {
+      const response = await fetch("/api/launch-notification", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setNotifyState("success");
+        if (data.alreadyRegistered) {
+          toast({
+            variant: "success",
+            duration: 4000,
+            title: "🎉 You're already on the list!",
+            description: "We'll email you when SeedofCode launches.",
+          });
+        } else {
+          toast({
+            variant: "success",
+            duration: 4000,
+            title: "🎉 You're on the list!",
+            description: "We'll email you when SeedofCode launches.",
+          });
+        }
+      } else {
+        throw new Error(data.message || "Failed to join list");
+      }
+    } catch (error) {
+      console.error("Notify Me Error:", error);
+      toast({
+        variant: "destructive",
+        duration: 3000,
+        title: "Uh oh! Something went wrong.",
+        description: error.message || "There was a problem processing your request.",
+      });
+      setNotifyState("default");
+    }
+  };
 
   if (!open) return null;
 
@@ -32,32 +98,34 @@ export default function MaintenanceDialog({ open, onClose }) {
         aria-labelledby="maintenance-title"
         className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-6"
       >
-        <div className="relative w-full max-w-3xl bg-white rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-          {/* Close button */}
+        <div className="relative w-full max-w-3xl max-h-[calc(100vh-32px)] bg-white rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col">
+          {/* Close button (Fixed Header element) */}
           <button
             onClick={onClose}
-            className="absolute top-6 right-6 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors z-10"
+            className="absolute top-6 right-6 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors z-20 bg-white shadow-sm md:shadow-none"
             aria-label="Close"
           >
             <X size={24} />
           </button>
 
-          <div className="p-8 md:p-10 flex flex-col gap-8">
+          {/* Scrollable Content Area */}
+          <div className="overflow-y-auto p-8 md:p-10 flex flex-col gap-8 custom-scrollbar">
             {/* Top section: Image + Text */}
-            <div className="flex flex-col md:flex-row gap-10 items-center md:items-start">
+            <div className="flex flex-col md:flex-row gap-10 items-center md:items-center">
               {/* Left Image */}
-              <div className="w-full md:w-1/3 flex justify-center shrink-0">
+              <div className="w-full md:w-5/12 flex justify-center shrink-0">
                 <Image
                   src="/image_for_maintanance.png"
                   alt="Growing seed"
-                  width={220}
-                  height={280}
-                  className="object-contain max-h-[300px]"
+                  width={380}
+                  height={450}
+                  className="object-contain"
+                  priority
                 />
               </div>
 
               {/* Right Text Content */}
-              <div className="w-full md:w-2/3 flex flex-col gap-5 pt-2">
+              <div className="w-full md:w-7/12 flex flex-col gap-5 pt-2">
                 {/* Badge */}
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#f0fdf4] text-green-700 rounded-full w-fit font-medium text-sm">
                   <Sparkles size={16} className="text-yellow-500" />
@@ -95,7 +163,7 @@ export default function MaintenanceDialog({ open, onClose }) {
             </div>
 
             {/* Middle Section: Date & Link Card */}
-            <div className="flex flex-col md:flex-row w-full border border-green-200/60 rounded-2xl bg-white shadow-sm overflow-hidden">
+            <div className="flex flex-col md:flex-row w-full border border-green-200/60 rounded-2xl bg-white shadow-sm overflow-hidden shrink-0">
               <div className="flex-1 p-5 md:p-6 flex items-center gap-5 border-b md:border-b-0 md:border-r border-green-200/60">
                 <div className="p-2.5 bg-green-50 text-green-700 rounded-xl">
                   <CalendarDays size={28} strokeWidth={1.5} />
@@ -118,17 +186,38 @@ export default function MaintenanceDialog({ open, onClose }) {
               </div>
             </div>
 
-            {/* Bottom Section: Buttons */}
-            <div className="flex flex-col md:flex-row gap-4 w-full">
+            {/* Bottom Section: Buttons (Part of scrollable content but pinned at bottom due to flex-col gap) */}
+            <div className="flex flex-col md:flex-row gap-4 w-full shrink-0">
               <button
-                onClick={onClose}
-                className="flex-1 flex items-center justify-center gap-3 bg-[#429546] hover:bg-[#347837] text-white p-4 rounded-xl transition-all shadow-lg shadow-green-700/20 active:scale-[0.98]"
+                onClick={handleNotifyClick}
+                disabled={notifyState !== "default"}
+                className={`flex-1 flex items-center justify-center gap-3 p-4 rounded-xl transition-all shadow-lg active:scale-[0.98]
+                  ${notifyState === "default" ? "bg-[#429546] hover:bg-[#347837] text-white shadow-green-700/20" : ""}
+                  ${notifyState === "loading" ? "bg-green-600 opacity-90 cursor-wait text-white" : ""}
+                  ${notifyState === "success" ? "bg-gray-100 text-gray-500 cursor-not-allowed shadow-none" : ""}
+                `}
               >
-                <Bell size={24} />
-                <div className="flex flex-col items-start">
-                  <span className="font-bold text-lg leading-none mb-1">Notify Me</span>
-                  <span className="text-green-100 text-xs font-medium">I want to be the first to know</span>
-                </div>
+                {notifyState === "default" && (
+                  <>
+                    <Bell size={24} />
+                    <div className="flex flex-col items-start">
+                      <span className="font-bold text-lg leading-none mb-1">Notify Me</span>
+                      <span className="text-green-100 text-xs font-medium">I want to be the first to know</span>
+                    </div>
+                  </>
+                )}
+                {notifyState === "loading" && (
+                  <>
+                    <Loader2 size={24} className="animate-spin" />
+                    <span className="font-bold text-lg leading-none">Joining...</span>
+                  </>
+                )}
+                {notifyState === "success" && (
+                  <>
+                    <Check size={24} className="text-green-500" />
+                    <span className="font-bold text-lg leading-none text-green-600">✓ You&apos;re on the list</span>
+                  </>
+                )}
               </button>
 
               <button
@@ -144,7 +233,7 @@ export default function MaintenanceDialog({ open, onClose }) {
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-center gap-2 text-gray-500 text-sm font-medium pt-2">
+            <div className="flex items-center justify-center gap-2 text-gray-500 text-sm font-medium pt-2 shrink-0">
               <HeartHandshake size={20} className="text-[#429546]" />
               Thank you for being part of SeedofCode&apos;s journey.
             </div>
