@@ -64,6 +64,30 @@ export async function POST(request) {
   }
 }
 
+export async function GET(request) {
+  try {
+    const userAuth = await auth();
+    const { userId } = userAuth;
+
+    if (!userId) {
+      return NextResponse.json({ registered: false });
+    }
+
+    const existing = await db
+      .select()
+      .from(LaunchNotifications)
+      .where(eq(LaunchNotifications.clerkId, userId));
+
+    if (existing && existing.length > 0 && existing[0].notifyMe) {
+      return NextResponse.json({ registered: true });
+    }
+
+    return NextResponse.json({ registered: false });
+  } catch (error) {
+    console.error("Error checking notification status:", error);
+    return NextResponse.json({ registered: false });
+  }
+}
 async function sendConfirmationEmail(toEmail, firstName) {
   // Only attempt to send if SMTP variables are set (to prevent crashing in dev)
   if (!process.env.SMTP_HOST || !process.env.SMTP_USER) {
